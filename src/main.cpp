@@ -14,6 +14,14 @@ extern void apiLoop();
 extern bool deauthActive;
 extern bool deauthLoop();
 
+// Novos loops não-bloqueantes
+extern void bfLoop();
+extern void cc1101CaptureLoop();
+extern void btJammerLoop();
+extern bool cc1101CopyActive;
+extern bool btJammerActive;
+extern bool bfRunning;
+
 bool nrf24OK = false;
 bool cc1101OK = false;
 
@@ -54,7 +62,15 @@ void setup() {
 }
 
 void loop() {
+    // 1. Processa requisições HTTP do Termux (CRÍTICO)
     apiLoop();
+
+    // 2. Loops de ferramentas em background (Não bloqueantes)
     if (deauthActive) deauthLoop();
+    if (bfRunning) bfLoop();
+    if (cc1101CopyActive) cc1101CaptureLoop();
+    if (btJammerActive) btJammerLoop();
+
+    // 3. Atualiza display e lê botões
     menuLoop();
 }
